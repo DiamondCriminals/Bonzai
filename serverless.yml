@@ -1,0 +1,81 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: intro
+
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: Bonzai
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-north-1
+  environment:
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.roomsTable}
+            - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.bookingsTable}
+
+functions:
+  CreateRoom:
+    handler: functions/CreateRoom/index.handler
+    events:
+      - httpApi:
+          path: /rooms
+          method: post
+  BookRoom:
+    handler: functions/BookRoom/index.handler
+    events:
+      - httpApi:
+          path: /rooms/{id}
+          method: post
+
+resources:
+  Resources:
+    RoomsTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${self:custom.roomsTable}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: room_type
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: room_type
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+    BookingsTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${self:custom.bookingsTable}
+        AttributeDefinitions:
+          - AttributeName: room_id
+            AttributeType: S
+          - AttributeName: checkin_date
+            AttributeType: S
+        KeySchema:
+          - AttributeName: room_id
+            KeyType: HASH
+          - AttributeName: checkin_date
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+custom:
+  roomsTable: bonzai_rooms
+  bookingsTable: bonzai_bookings
