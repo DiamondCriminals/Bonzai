@@ -20,6 +20,7 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
           Resource:
             - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.roomsTable}
             - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.bookingsTable}
@@ -35,7 +36,7 @@ functions:
     handler: functions/BookRoom/index.handler
     events:
       - httpApi:
-          path: /rooms/{id}
+          path: /book
           method: post
 
 resources:
