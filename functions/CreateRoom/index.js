@@ -9,7 +9,7 @@ exports.handler = async (event) => {
   const body = JSON.parse(event.body);
   const newRoom = {
     id: 'ROOM',
-    room_type: `#${body.room_type}:${uuid()}`,
+    room_type: `${body.room_type}:${uuid()}`,
     price: Number(body.price),
     capacity: Number(body.capacity),
   };
