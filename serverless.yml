@@ -18,6 +18,7 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
+            - dynamodb:BatchGetItem
           Resource:
             - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.roomsTable}
             - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.bookingsTable}

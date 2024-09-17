@@ -10,8 +10,8 @@ exports.handler = async (event) => {
   const newRoom = {
     id: 'ROOM',
     room_type: `#${body.room_type}:${uuid()}`,
-    price: body.price,
-    capacity: body.capacity,
+    price: Number(body.price),
+    capacity: Number(body.capacity),
   };
 
   const params = {

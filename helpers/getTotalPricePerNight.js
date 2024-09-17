@@ -6,7 +6,7 @@ const TABLE_NAME = 'bonzai_rooms';
 exports.getTotalPricePerNight = async (room_ids) => {
   const keys = room_ids.map((type) => ({
     id: 'ROOM',
-    type: type,
+    room_type: type,
   }));
 
   const params = {
@@ -23,7 +23,7 @@ exports.getTotalPricePerNight = async (room_ids) => {
 
     const totalPricePerNight = data.Responses[TABLE_NAME].reduce(
       (sum, room) => {
-        const pricePerNight = Number(roomPrices[room.type]) || 0;
+        const pricePerNight = Number(room.price) || 0;
         return sum + pricePerNight;
       },
       0
