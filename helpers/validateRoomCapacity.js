@@ -3,10 +3,10 @@ const { db } = require('../services/db');
 
 const TABLE_NAME = 'bonzai_rooms';
 
-exports.validateRoomCapacity = async (room_ids, requiredCapacity) => {
+const validateRoomCapacity = async (room_ids, requiredCapacity) => {
   const keys = room_ids.map((type) => ({
     id: 'ROOM',
-    type: type,
+    room_type: type,
   }));
 
   const params = {
@@ -20,13 +20,13 @@ exports.validateRoomCapacity = async (room_ids, requiredCapacity) => {
   try {
     const command = new BatchGetCommand(params);
     const data = await db.send(command);
-
+    console.log('data.Responses', data.Responses);
     const rooms = data.Responses[TABLE_NAME];
 
     let totalCapacity = 0;
 
     for (const room of rooms) {
-      const roomCapacity = room.capacity;
+      const roomCapacity = Number(room.capacity);
 
       totalCapacity += roomCapacity;
 
@@ -39,3 +39,5 @@ exports.validateRoomCapacity = async (room_ids, requiredCapacity) => {
 
   return false;
 };
+
+module.exports = validateRoomCapacity;

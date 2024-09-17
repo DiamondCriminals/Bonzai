@@ -1,13 +1,10 @@
 const { sendError, sendResponse } = require('../../services/responses');
-const { PutCommand, BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
+const { BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../../services/db');
 const { v4: uuid } = require('uuid');
 const calculateDateDiff = require('../../helpers/calculateDateDiff');
-const getRoomsForValidation = require('../../helpers/getRoomsForValidation');
 const validateRoomCapacity = require('../../helpers/validateRoomCapacity');
-const {
-  validateRoomAvailability,
-} = require('../../helpers/validateRoomAvailability');
+const validateRoomAvailability = require('../../helpers/validateRoomAvailability');
 const {
   getTotalPricePerNight,
 } = require('../../helpers/getTotalPricePerNight');
@@ -67,8 +64,6 @@ exports.handler = async (event) => {
       },
     },
   }));
-
-  console.log('newBookings', newBookings);
 
   const params = {
     RequestItems: {
