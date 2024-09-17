@@ -39,7 +39,7 @@ functions:
     handler: functions/BookRoom/index.handler
     events:
       - httpApi:
-          path: /book
+          path: /reservations
           method: post
 
 package:
@@ -88,11 +88,23 @@ resources:
             AttributeType: S
           - AttributeName: checkin_date
             AttributeType: S
+          - AttributeName: booking_id
+            AttributeType: S
         KeySchema:
           - AttributeName: room_id
             KeyType: HASH
           - AttributeName: checkin_date
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: BookingIdIndex
+            KeySchema:
+              - AttributeName: booking_id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
