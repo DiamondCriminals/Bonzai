@@ -3,6 +3,14 @@ const { PutCommand, BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../../services/db');
 const { v4: uuid } = require('uuid');
 const calculateDateDiff = require('../../helpers/calculateDateDiff');
+const getRoomsForValidation = require('../../helpers/getRoomsForValidation');
+const validateRoomCapacity = require('../../helpers/validateRoomCapacity');
+const {
+  validateRoomAvailability,
+} = require('../../helpers/validateRoomAvailability');
+const {
+  getTotalPricePerNight,
+} = require('../../helpers/getTotalPricePerNight');
 
 const TABLE_NAME = 'bonzai_bookings';
 
@@ -16,20 +24,37 @@ exports.handler = async (event) => {
 
   const booking_id = uuid();
 
-  // Att få in här är totalt pris för hela bokningen istället för varje rum, skapas upp ett objekt per rum i en hel bokning men alla med samma bokningsnummer.
+  try {
+    const isCapacityValid = await validateRoomCapacity(room_ids, body.quantity);
+    if (!isCapacityValid)
+      return sendError(
+        400,
+        'Total room capacity is less than the required quantity.'
+      );
+  } catch (err) {
+    console.log('Error during room capacity validation:', err);
+    return sendError(500, err.message);
+  }
 
-  // I forEach-loopen så krävs även validering per rum att det inte är bokat, om bokat så kasta ett fel om att rum ej är tillgängligt
+  try {
+    const isAvailable = await validateRoomAvailability(
+      room_ids,
+      checkin_date,
+      checkout_date
+    );
+    if (!isAvailable) {
+      return sendError(
+        400,
+        'One or more rooms are not available for the selected dates.'
+      );
+    }
+  } catch (err) {
+    console.log('Error during room availability validation:', err);
+    return sendError(500, err.message);
+  }
 
-  // Även kontrollera så att den summerade capacity inte understiger quantity i request
-
-  //* REQUESTOBJEKT
-  //   {
-  //     "room_ids": [],
-  //     "checkin_date": "2024-09-17",
-  //     "checkout_date": "2024-09-21",
-  //     "name": "Anton",
-  //     "quantity":
-  // }
+  const totalPricePerNight = await getTotalPricePerNight(room_ids);
+  const totalCost = totalPricePerNight * nightsToStay;
 
   const newBookings = room_ids.map((id) => ({
     PutRequest: {
@@ -38,7 +63,7 @@ exports.handler = async (event) => {
         checkin_date: checkin_date.toISOString(),
         checkout_date: checkout_date.toISOString(),
         bookings_id: booking_id,
-        total_cost: Number(roomPrice) * nightsToStay,
+        total_cost: totalCost,
         booker: body.name,
       },
     },
@@ -51,13 +76,10 @@ exports.handler = async (event) => {
       [TABLE_NAME]: newBookings,
     },
   };
-
-  console.log('params', params);
   try {
     const command = new BatchWriteCommand(params);
-    console.log('command', command);
     await db.send(command);
-    sendResponse(201, params.Item);
+    return sendResponse(201, { booking_id, totalCost });
   } catch (err) {
     console.log('err', err);
     sendError(500, err.message);
