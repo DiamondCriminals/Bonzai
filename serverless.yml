@@ -42,6 +42,18 @@ functions:
       - httpApi:
           path: /reservations
           method: post
+  GetAllBookings:
+    handler: functions/GetAllBookings/index.handler
+    events:
+      - httpApi:
+          path: /reservations
+          method: get
+  DeleteReservation:
+    handler: functions/DeleteReservation/index.handler
+    events:
+      - httpApi:
+          path: /reservations/{id}
+          method: delete
 
 package:
   individually: true
