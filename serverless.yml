@@ -23,6 +23,12 @@ provider:
             - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.bookingsTable}
 
 functions:
+  GetRooms:
+    handler: functions/GetRooms/index.handler
+    events:
+      - httpApi:
+          path: /rooms
+          method: get
   CreateRoom:
     handler: functions/CreateRoom/index.handler
     events:
