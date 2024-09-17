@@ -36,6 +36,9 @@ functions:
           path: /book
           method: post
 
+package:
+  individually: true
+
 resources:
   Resources:
     RoomsTable:
@@ -47,11 +50,25 @@ resources:
             AttributeType: S
           - AttributeName: room_type
             AttributeType: S
+          - AttributeName: capacity
+            AttributeType: N
         KeySchema:
           - AttributeName: id
             KeyType: HASH
           - AttributeName: room_type
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: IdCapacityIndex
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+              - AttributeName: capacity
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5

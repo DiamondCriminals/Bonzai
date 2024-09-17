@@ -23,7 +23,7 @@ exports.handler = async (event) => {
   try {
     await db.send(command);
 
-    sendResponse(201, newRoom);
+    return sendResponse(201, newRoom);
   } catch (err) {
     sendError(500, err.message);
   }
