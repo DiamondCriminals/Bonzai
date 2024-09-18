@@ -29,15 +29,16 @@ exports.handler = async (event) => {
 
   const queryParams = {
     TableName: TABLE_NAME,
-    IndexName: 'BookingIdIndex',
     KeyConditionExpression: 'booking_id = :booking_id',
     ExpressionAttributeValues: {
       ':booking_id': booking_id,
     },
   };
 
+  console.log('queryParams', queryParams);
   try {
     const queryCommand = new QueryCommand(queryParams);
+    console.log('queryCommand', queryCommand);
     const { Items } = await db.send(queryCommand);
 
     if (Items.length == 0) sendError(404, 'Reservation not found');
@@ -56,14 +57,15 @@ exports.handler = async (event) => {
     const deleteRequests = roomsToDelete.map((room_id) => ({
       DeleteRequest: {
         Key: {
-          room_id: room_id,
+          booking_id: booking_id,
         },
-        ConditionExpression: 'booking_id = :booking_id',
+        ConditionExpression: 'room_id = :room_id',
         ExpressionAttributeValues: {
-          ':booking_id': booking_id,
+          ':room_id': room_id,
         },
       },
     }));
+    console.log('deleteRequests', deleteRequests);
 
     const putRequests = roomsToAdd.map((room_id) => ({
       PutRequest: {
@@ -78,12 +80,11 @@ exports.handler = async (event) => {
         },
       },
     }));
+    console.log('putRequests', putRequests);
 
     const updateRequests = roomsToUpdate.map((room_id) => ({
-      TableName: TABLE_NAME,
       Key: {
         booking_id: booking_id,
-        room_id: room_id,
       },
       UpdateExpression:
         'SET checkin_date = :checkin_date, checkout_date = :checkout_date, total_cost = :total_cost, quantity = :quantity',
@@ -97,9 +98,11 @@ exports.handler = async (event) => {
     }));
 
     const batchRequest = [...deleteRequests, ...putRequests];
+    console.log('batchRequest', batchRequest);
 
     try {
       if (batchRequest.length > 0) {
+        console.log('batchRequest.length', batchRequest.length);
         const batchParams = {
           RequestItems: {
             [TABLE_NAME]: batchRequest,
@@ -110,7 +113,11 @@ exports.handler = async (event) => {
       }
 
       for (const request of updateRequests) {
-        const command = new UpdateCommand(request);
+        const command = new UpdateCommand({
+          TableName: TABLE_NAME,
+          ...request,
+        });
+        console.log('command', command);
         await db.send(command);
       }
 

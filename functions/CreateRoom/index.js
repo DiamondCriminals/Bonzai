@@ -8,7 +8,7 @@ const TABLE_NAME = process.env.ROOMS_TABLE;
 
 exports.handler = async (event) => {
   const body = JSON.parse(event.body);
-
+  console.log('body', body);
   const { capacity } = body;
 
   if (capacity == undefined)

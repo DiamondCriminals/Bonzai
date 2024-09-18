@@ -15,6 +15,7 @@ const validateRoomAvailability = async (
   for (const room_id of room_ids) {
     const params = {
       TableName: TABLE_NAME,
+      IndexName: 'RoomIdIndex',
       KeyConditionExpression: 'room_id = :room_id',
       FilterExpression: 'booking_id <> :booking_id',
       ExpressionAttributeValues: {
@@ -22,6 +23,7 @@ const validateRoomAvailability = async (
         ':booking_id': booking_id,
       },
     };
+    console.log('params', params);
 
     try {
       const command = new QueryCommand(params);

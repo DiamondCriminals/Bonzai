@@ -106,12 +106,12 @@ resources:
           - AttributeName: type
             AttributeType: S
         KeySchema:
-          - AttributeName: room_id
+          - AttributeName: booking_id
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: BookingIdIndex
+          - IndexName: RoomIdIndex
             KeySchema:
-              - AttributeName: booking_id
+              - AttributeName: room_id
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
