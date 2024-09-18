@@ -7,9 +7,12 @@ const TABLE_NAME = 'bonzai_hotelrooms';
 exports.handler = async () => {
   const params = {
     TableName: TABLE_NAME,
-    KeyConditionExpression: 'type = :type',
+    KeyConditionExpression: '#typeAlias = :typeValue',
+    ExpressionAttributeNames: {
+      '#typeAlias': 'type',
+    },
     ExpressionAttributeValues: {
-      ':type': 'ROOM',
+      ':typeValue': 'ROOM',
     },
   };
   try {
