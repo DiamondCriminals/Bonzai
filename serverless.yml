@@ -65,29 +65,15 @@ resources:
       Properties:
         TableName: ${self:custom.roomsTable}
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: type
             AttributeType: S
-          - AttributeName: room_type
+          - AttributeName: room_id
             AttributeType: S
-          - AttributeName: capacity
-            AttributeType: N
         KeySchema:
-          - AttributeName: id
+          - AttributeName: type
             KeyType: HASH
-          - AttributeName: room_type
+          - AttributeName: room_id
             KeyType: RANGE
-        GlobalSecondaryIndexes:
-          - IndexName: IdCapacityIndex
-            KeySchema:
-              - AttributeName: id
-                KeyType: HASH
-              - AttributeName: capacity
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
@@ -123,5 +109,5 @@ resources:
           WriteCapacityUnits: 5
 
 custom:
-  roomsTable: bonzai_rooms
+  roomsTable: bonzai_hotelrooms
   bookingsTable: bonzai_bookings

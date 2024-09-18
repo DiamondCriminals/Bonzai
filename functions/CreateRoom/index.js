@@ -3,13 +3,13 @@ const { PutCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../../services/db');
 const { v4: uuid } = require('uuid');
 
-const TABLE_NAME = 'bonzai_rooms';
+const TABLE_NAME = 'bonzai_hotelrooms';
 
 exports.handler = async (event) => {
   const body = JSON.parse(event.body);
   const newRoom = {
-    id: 'ROOM',
-    room_type: `${body.room_type}:${uuid()}`,
+    type: 'ROOM',
+    room_id: `${body.room_type}:${uuid()}`,
     price: Number(body.price),
     capacity: Number(body.capacity),
   };

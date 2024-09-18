@@ -2,14 +2,14 @@ const { sendError, sendResponse } = require('../../services/responses');
 const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../../services/db');
 
-const TABLE_NAME = 'bonzai_rooms';
+const TABLE_NAME = 'bonzai_hotelrooms';
 
-exports.handler = async (event) => {
+exports.handler = async () => {
   const params = {
     TableName: TABLE_NAME,
-    KeyConditionExpression: 'id = :id',
+    KeyConditionExpression: 'type = :type',
     ExpressionAttributeValues: {
-      ':id': 'ROOM',
+      ':type': 'ROOM',
     },
   };
   try {

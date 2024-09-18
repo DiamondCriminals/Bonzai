@@ -1,12 +1,12 @@
 const { BatchGetCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../services/db');
 
-const TABLE_NAME = 'bonzai_rooms';
+const TABLE_NAME = 'bonzai_hotelrooms';
 
 const validateRoomCapacity = async (room_ids, requiredCapacity) => {
-  const keys = room_ids.map((type) => ({
-    id: 'ROOM',
-    room_type: type,
+  const keys = room_ids.map((id) => ({
+    type: 'ROOM',
+    room_id: id,
   }));
 
   const params = {
