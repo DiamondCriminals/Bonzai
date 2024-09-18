@@ -1,34 +1,46 @@
 const { sendResponse, sendError } = require('../../services/responses');
-const { QueryCommand } = require('@aws-sdk/client-dynamodb');
+const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../../services/db');
 
 const BOOKING_LIST = 'bonzai_bookings';
 
-exports.handler = async() => {
+exports.handler = async () => {
+  const params = {
+    TableName: BOOKING_LIST,
+    IndexName: 'BookingTypeIndex',
+    KeyConditionExpression: '#typeAlias = :typeValue',
+    ExpressionAttributeNames: {
+      '#typeAlias': 'type',
+    },
+    ExpressionAttributeValues: {
+      ':typeValue': 'RESERVATION',
+    },
+  };
 
-    const getBookings = {
-        TableName: BOOKING_LIST,
-        IndexName: 'BookingIdIndex',
-        KeyConditionExpression: 'begins_with(booking_id, :prefix)',
-        ExpressionAttributeValues: {
-            ':prefix': 'RESERVATION',
-        }
-    }
+  try {
+    const command = new QueryCommand(params);
+    const result = await db.send(command);
 
-    console.log(getBookings, 'getbok');
-    
+    const groupedBookings = [];
 
-    try {
-        const command = new QueryCommand(getBookings);
-        console.log(command, 'command');
-        const result = await db.send(command); 
+    result.Items.forEach((result) => {
+      const { booking_id, room_id, ...fields } = result;
 
-        const items = result.Items || []
+      if (groupedBookings[booking_id]) {
+        groupedBookings[booking_id].room_ids.push(room_id);
+      } else {
+        groupedBookings[booking_id] = {
+          ...fields,
+          booking_id: booking_id,
+          room_ids: [room_id],
+        };
+      }
+    });
 
-        console.log(result, 'items');
+    const mergedResults = Object.values(groupedBookings);
 
-        return sendResponse(201, items)
-    } catch(error) {
-        return sendError(500, error.message)
-    }
-}
+    return sendResponse(201, mergedResults);
+  } catch (error) {
+    return sendError(500, error.message);
+  }
+};

@@ -19,9 +19,11 @@ provider:
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
             - dynamodb:BatchGetItem
+            - dynamodb:Query
           Resource:
             - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.roomsTable}
             - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.bookingsTable}
+            - !Sub arn:aws:dynamodb:eu-north-1:${aws:accountId}:table/${self:custom.bookingsTable}/index/*
 
 functions:
   GetRooms:
@@ -49,7 +51,7 @@ functions:
           path: /reservations
           method: get
   DeleteReservation:
-    handler: functions/DeleteReservation/index.handler
+    handler: functions/DeleteBooking/index.handler
     events:
       - httpApi:
           path: /reservations/{id}
@@ -89,6 +91,8 @@ resources:
             AttributeType: S
           - AttributeName: booking_id
             AttributeType: S
+          - AttributeName: type
+            AttributeType: S
         KeySchema:
           - AttributeName: room_id
             KeyType: HASH
@@ -98,6 +102,15 @@ resources:
           - IndexName: BookingIdIndex
             KeySchema:
               - AttributeName: booking_id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+          - IndexName: BookingTypeIndex
+            KeySchema:
+              - AttributeName: type
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

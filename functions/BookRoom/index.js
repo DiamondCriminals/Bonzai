@@ -18,7 +18,7 @@ exports.handler = async (event) => {
   const nightsToStay = calculateDateDiff(checkin_date, checkout_date);
   const room_ids = body.room_ids;
 
-  const booking_id = 'RESERVATION:' + uuid();
+  const booking_id = uuid();
 
   try {
     const isCapacityValid = await validateRoomCapacity(room_ids, body.quantity);
@@ -58,9 +58,10 @@ exports.handler = async (event) => {
         room_id: id,
         checkin_date: checkin_date.toISOString(),
         checkout_date: checkout_date.toISOString(),
-        bookings_id: booking_id,
+        booking_id: booking_id,
         total_cost: totalCost,
         booker: body.name,
+        type: 'RESERVATION',
       },
     },
   }));
