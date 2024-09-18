@@ -22,3 +22,5 @@ const generateRoomFields = (capacity) => {
       };
   }
 };
+
+module.exports = generateRoomFields;
