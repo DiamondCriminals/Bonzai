@@ -7,11 +7,21 @@ const TABLE_NAME = 'bonzai_hotelrooms';
 
 exports.handler = async (event) => {
   const body = JSON.parse(event.body);
+
+  const { capacity } = body;
+
+  if (capacity == undefined)
+    return sendError(400, 'Need to give how many people fits in the room.');
+
+  const roomFields = generateRoomFields(Number(capacity));
+
+  if (roomFields.error) return sendError(400, roomFields.message);
+
   const newRoom = {
-    type: 'ROOM',
-    room_id: `${body.room_type}:${uuid()}`,
-    price: Number(body.price),
-    capacity: Number(body.capacity),
+    type: `ROOM`,
+    room_id: `${roomFields.type}:${uuid()}`,
+    price: Number(roomFields.price),
+    capacity: Number(capacity),
   };
 
   const params = {
