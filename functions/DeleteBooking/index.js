@@ -9,7 +9,6 @@ exports.handler = async (event) => {
 
   const queryParams = {
     TableName: BOOKING_LIST,
-    IndexName: 'BookingIdIndex',
     KeyConditionExpression: 'booking_id = :bookingId',
     ExpressionAttributeValues: {
       ':bookingId': bookingId,
@@ -33,8 +32,7 @@ exports.handler = async (event) => {
     const deleteRequests = queryResult.Items.map((item) => ({
       DeleteRequest: {
         Key: {
-          room_id: item.room_id,
-          checkin_date: item.checkin_date,
+          booking_id: item.room_id,
         },
       },
     }));

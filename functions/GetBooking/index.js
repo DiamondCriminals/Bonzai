@@ -9,7 +9,6 @@ exports.handler = async (event) => {
 
   const queryParams = {
     TableName: TABLE_NAME,
-    IndexName: 'BookingIdIndex',
     KeyConditionExpression: 'booking_id = :booking_id',
     ExpressionAttributeValues: {
       ':booking_id': booking_id,
