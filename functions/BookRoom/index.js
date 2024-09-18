@@ -3,13 +3,12 @@ const { BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../../services/db');
 const { v4: uuid } = require('uuid');
 const calculateDateDiff = require('../../helpers/calculateDateDiff');
-const validateRoomCapacity = require('../../helpers/validateRoomCapacity');
-const validateRoomAvailability = require('../../helpers/validateRoomAvailability');
 const {
   getTotalPricePerNight,
 } = require('../../helpers/getTotalPricePerNight');
+const addAndUpdateValidator = require('../../helpers/addAndUpdateValidator');
 
-const TABLE_NAME = 'bonzai_bookings';
+const TABLE_NAME = process.env.BOOKINGS_TABLE;
 
 exports.handler = async (event) => {
   const body = JSON.parse(event.body);
@@ -18,36 +17,12 @@ exports.handler = async (event) => {
   const nightsToStay = calculateDateDiff(checkin_date, checkout_date);
   const room_ids = body.room_ids;
 
+  console.log('body', body);
   const booking_id = uuid();
 
-  try {
-    const isCapacityValid = await validateRoomCapacity(room_ids, body.quantity);
-    if (!isCapacityValid)
-      return sendError(
-        400,
-        'Total room capacity is less than the required quantity.'
-      );
-  } catch (err) {
-    console.log('Error during room capacity validation:', err);
-    return sendError(500, err.message);
-  }
-
-  try {
-    const isAvailable = await validateRoomAvailability(
-      room_ids,
-      checkin_date,
-      checkout_date
-    );
-    if (!isAvailable) {
-      return sendError(
-        400,
-        'One or more rooms are not available for the selected dates.'
-      );
-    }
-  } catch (err) {
-    console.log('Error during room availability validation:', err);
-    return sendError(500, err.message);
-  }
+  const isValid = await addAndUpdateValidator(body, booking_id);
+  console.log('isValid', isValid);
+  if (!isValid.valid) return sendError(400, isValid.message);
 
   const totalPricePerNight = await getTotalPricePerNight(room_ids);
   const totalCost = totalPricePerNight * nightsToStay;
@@ -60,6 +35,7 @@ exports.handler = async (event) => {
         checkout_date: checkout_date.toISOString(),
         booking_id: booking_id,
         total_cost: totalCost,
+        quantity: Number(body.quantity),
         booker: body.name,
         type: 'RESERVATION',
       },

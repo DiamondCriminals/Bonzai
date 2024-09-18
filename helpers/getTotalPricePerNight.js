@@ -1,7 +1,7 @@
 const { BatchGetCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../services/db');
 
-const TABLE_NAME = 'bonzai_hotelrooms';
+const TABLE_NAME = process.env.ROOMS_TABLE;
 
 exports.getTotalPricePerNight = async (room_ids) => {
   const keys = room_ids.map((id) => ({

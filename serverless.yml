@@ -6,6 +6,8 @@ provider:
   runtime: nodejs20.x
   region: eu-north-1
   environment:
+    BOOKINGS_TABLE: ${self:custom.bookingsTable}
+    ROOMS_TABLE: ${self:custom.roomsTable}
   iam:
     role:
       statements:
@@ -50,7 +52,19 @@ functions:
       - httpApi:
           path: /reservations
           method: get
-  DeleteReservation:
+  GetBooking:
+    handler: functions/GetBooking/index.handler
+    events:
+      - httpApi:
+          path: /reservations/{id}
+          method: get
+  UpdateBooking:
+    handler: functions/UpdateBooking/index.handler
+    events:
+      - httpApi:
+          path: /reservations/{id}
+          method: put
+  DeleteBooking:
     handler: functions/DeleteBooking/index.handler
     events:
       - httpApi:
@@ -87,8 +101,6 @@ resources:
         AttributeDefinitions:
           - AttributeName: room_id
             AttributeType: S
-          - AttributeName: checkin_date
-            AttributeType: S
           - AttributeName: booking_id
             AttributeType: S
           - AttributeName: type
@@ -96,8 +108,6 @@ resources:
         KeySchema:
           - AttributeName: room_id
             KeyType: HASH
-          - AttributeName: checkin_date
-            KeyType: RANGE
         GlobalSecondaryIndexes:
           - IndexName: BookingIdIndex
             KeySchema:
@@ -123,4 +133,4 @@ resources:
 
 custom:
   roomsTable: bonzai_hotelrooms
-  bookingsTable: bonzai_bookings
+  bookingsTable: bonzai_reservations
