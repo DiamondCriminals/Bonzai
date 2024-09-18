@@ -2,6 +2,7 @@ const { sendError, sendResponse } = require('../../services/responses');
 const { PutCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../../services/db');
 const { v4: uuid } = require('uuid');
+const generateRoomFields = require('../../helpers/generateRoomFields');
 
 const TABLE_NAME = 'bonzai_hotelrooms';
 
