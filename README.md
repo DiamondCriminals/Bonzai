@@ -24,6 +24,7 @@ Exempalanrop vid POST: {url}/reservations
   "room_ids": ["{ROOM_ID}", "{ROOM_ID}"],
   "quantity": 3,
   "checkin_date": "2024-09-19",
-  "checkout_date": "2024-09-22"
+  "checkout_date": "2024-09-22",
+  "name": "Ditt namn"
 }
 ```

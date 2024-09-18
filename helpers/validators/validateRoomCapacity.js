@@ -1,7 +1,7 @@
 const { BatchGetCommand } = require('@aws-sdk/lib-dynamodb');
-const { db } = require('../services/db');
+const { db } = require('../../services/db');
 
-const TABLE_NAME = 'bonzai_hotelrooms';
+const TABLE_NAME = process.env.ROOMS_TABLE;
 
 const validateRoomCapacity = async (room_ids, requiredCapacity) => {
   const keys = room_ids.map((id) => ({
@@ -9,6 +9,7 @@ const validateRoomCapacity = async (room_ids, requiredCapacity) => {
     room_id: id,
   }));
 
+  console.log('keys', keys);
   const params = {
     RequestItems: {
       [TABLE_NAME]: {
@@ -16,9 +17,10 @@ const validateRoomCapacity = async (room_ids, requiredCapacity) => {
       },
     },
   };
-
+  console.log('params', params);
   try {
     const command = new BatchGetCommand(params);
+    console.log('command', command);
     const data = await db.send(command);
     console.log('data.Responses', data.Responses);
     const rooms = data.Responses[TABLE_NAME];

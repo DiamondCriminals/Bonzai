@@ -4,7 +4,7 @@ const { db } = require('../../services/db');
 const { v4: uuid } = require('uuid');
 const generateRoomFields = require('../../helpers/generateRoomFields');
 
-const TABLE_NAME = 'bonzai_hotelrooms';
+const TABLE_NAME = process.env.ROOMS_TABLE;
 
 exports.handler = async (event) => {
   const body = JSON.parse(event.body);

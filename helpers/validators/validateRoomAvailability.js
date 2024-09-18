@@ -1,12 +1,13 @@
 const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
-const { db } = require('../services/db');
+const { db } = require('../../services/db');
 
-const TABLE_NAME = 'bonzai_bookings';
+const TABLE_NAME = process.env.BOOKINGS_TABLE;
 
 const validateRoomAvailability = async (
   room_ids,
   checkin_date,
-  checkout_date
+  checkout_date,
+  booking_id
 ) => {
   const checkinDate = new Date(checkin_date);
   const checkoutDate = new Date(checkout_date);
@@ -15,8 +16,10 @@ const validateRoomAvailability = async (
     const params = {
       TableName: TABLE_NAME,
       KeyConditionExpression: 'room_id = :room_id',
+      FilterExpression: 'booking_id <> :booking_id',
       ExpressionAttributeValues: {
         ':room_id': room_id,
+        ':booking_id': booking_id,
       },
     };
 
@@ -24,11 +27,15 @@ const validateRoomAvailability = async (
       const command = new QueryCommand(params);
       const data = await db.send(command);
 
+      console.log('data.Items', data.Items);
+
       const hasOverlap = data.Items.some((item) => {
         const itemCheckinDate = new Date(item.checkin_date);
         const itemCheckoutDate = new Date(item.checkout_date);
 
-        return itemCheckinDate < checkoutDate && itemCheckoutDate > checkinDate;
+        return (
+          itemCheckinDate <= checkoutDate && itemCheckoutDate >= checkinDate
+        );
       });
 
       if (hasOverlap) return false;

@@ -2,13 +2,10 @@ const { sendResponse, sendError } = require('../../services/responses');
 const { db } = require('../../services/db');
 const { BatchWriteCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
-const BOOKING_LIST = 'bonzai_bookings';
+const BOOKING_LIST = process.env.BOOKINGS_TABLE;
 
 exports.handler = async (event) => {
-  console.log('event', event);
   const bookingId = event.pathParameters.id;
-
-  console.log('bookingId', bookingId);
 
   const queryParams = {
     TableName: BOOKING_LIST,
@@ -22,7 +19,6 @@ exports.handler = async (event) => {
   try {
     const queryCommand = new QueryCommand(queryParams);
     const queryResult = await db.send(queryCommand);
-    console.log('queryResult', queryResult);
     const { checkin_date } = queryResult.Items[0];
     const currentDate = new Date();
 

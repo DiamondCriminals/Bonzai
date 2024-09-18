@@ -2,7 +2,7 @@ const { sendResponse, sendError } = require('../../services/responses');
 const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { db } = require('../../services/db');
 
-const BOOKING_LIST = 'bonzai_bookings';
+const BOOKING_LIST = process.env.BOOKINGS_TABLE;
 
 exports.handler = async () => {
   const params = {
