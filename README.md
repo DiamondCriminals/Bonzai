@@ -31,9 +31,9 @@ sls deploy
     "type": "ROOM"
   }
 ]
-```
 
 </details>
+```
 
 **POST**
 Request:
@@ -53,8 +53,8 @@ Request:
     "price": 500,
     "capacity": 1
 }
-```
 </details>
+```
 
 ### {url}/reservations
 
@@ -76,8 +76,8 @@ Request:
         ]
     }
 ]
-```
 </details>
+```
 
 **POST**
 Request:
@@ -99,8 +99,8 @@ Request:
     "booking_id": "33c16f19-4608-4a88-9ef7-20e0a2778dab",
     "totalCost": 3000
 }
-```
 </details>
+```
 
 ### {url}/reservations/{id}
 
@@ -121,8 +121,8 @@ Request:
         "DUBBEL:585753a3-afbd-4f7c-99c7-c1e671671c88"
     ]
 }
-```
 </details>
+```
 
 **POST**
 Request:
@@ -141,8 +141,9 @@ Request:
     "booking_id": "12997206-ae7b-44f2-ad99-91cb57574973",
     "totalCost": 1000,
 }
-```
+
 </details>
+```
 
 **PUT**
 Request:
@@ -166,5 +167,6 @@ Request:
     "totalCost": 1000,
     "message": "Successfully updated reservation."
 }
-```
+
 </details>
+```
